@@ -45,6 +45,17 @@ inline TList<T>::TList()
 }
 
 template<class T>
+inline TList<T>::~TList()
+{
+	TNode<T>* newNode;
+	while (pFirst != pStop) {
+		newNode = pFirst;
+		pFirst = pFirst->pNext;
+		delete newNode;
+	}
+}
+
+template<class T>
 inline bool TList<T>::IsEmpty()
 {
 	return len == 0;
@@ -53,7 +64,7 @@ inline bool TList<T>::IsEmpty()
 template<class T>
 inline void TList<T>::InsFirst(T value)
 {
-	TNode<T> newNode = new TNode<T>;
+	TNode<T>* newNode = new TNode<T>;
 	newNode->val = value;
 	newNode->pNext = pFirst;
 	pFirst = newNode;
@@ -69,7 +80,7 @@ template<class T>
 inline void TList<T>::InsLast(T value)
 {
 	if (len > 0) {
-		TNode<T> newNode = new TNode<T>;
+		TNode<T>* newNode = new TNode<T>;
 		newNode->val = value;
 		newNode->pNext = pStop;
 		pLast->pNext = newNode;
@@ -92,7 +103,7 @@ inline void TList<T>::InsCurrent(T value)
 		InsLast(value);
 	}
 	else {
-		TNode<T> newNode = new TNode<T>;
+		TNode<T>* newNode = new TNode<T>;
 		newNode->val = value;
 		newNode->pNext = pCurr;
 		pCurr = newNode;
@@ -108,7 +119,7 @@ inline void TList<T>::delFirst()
 		throw "List is empty";
 	}
 
-	TNode<T> newNode = pFirst;
+	TNode<T>* newNode = pFirst;
 	pFirst = newNode->pNext;
 	delete newNode;
 
@@ -130,7 +141,7 @@ inline void TList<T>::delCurrent()
 		delFirst();
 	}
 	else {
-		TNode<T> newNode = pCurr;
+		TNode<T>* newNode = pCurr;
 		pCurr = newNode->pNext;
 		pPrev->pNext = pCurr;
 		delete newNode;

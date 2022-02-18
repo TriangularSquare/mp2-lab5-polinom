@@ -34,6 +34,11 @@ public:
 
 	void delFirst();
 	void delCurrent();
+
+	void Reset();
+	void GoNext();
+	bool IsEnd();
+	T GetCurr();
 };
 
 template<class T>
@@ -73,6 +78,7 @@ inline void TList<T>::InsFirst(T value)
 
 	if (len == 1) {
 		pLast = pFirst;
+		pCurr = pFirst;
 	}
 }
 
@@ -119,6 +125,11 @@ inline void TList<T>::delFirst()
 		throw "List is empty";
 	}
 
+	if (pCurr == pFirst) {
+		pPrev = pStop;
+		pCurr = pCurr->pNext;
+	}
+
 	TNode<T>* newNode = pFirst;
 	pFirst = newNode->pNext;
 	delete newNode;
@@ -148,4 +159,30 @@ inline void TList<T>::delCurrent()
 
 		len--;
 	}
+}
+
+template<class T>
+inline void TList<T>::Reset()
+{
+	pPrev = pStop;
+	pCurr = pFirst;
+}
+
+template<class T>
+inline void TList<T>::GoNext()
+{
+	pPrev = pCurr;
+	pCurr = pCurr->pNext;
+}
+
+template<class T>
+inline bool TList<T>::IsEnd()
+{
+	return (pCurr == pStop);
+}
+
+template<class T>
+inline T TList<T>::GetCurr()
+{
+	return pCurr->val;
 }

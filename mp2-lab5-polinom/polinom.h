@@ -187,3 +187,61 @@ inline T TList<T>::GetCurr()
 {
 	return pCurr->val;
 }
+
+template <class T>
+class THeadList : public TList<T> {
+protected:
+	TNode<T>* pHead;
+public:
+	THeadList();
+	~THeadList();
+
+	void InsFirst(T elem);
+	void DelFirst();
+};
+
+template<class T>
+inline THeadList<T>::THeadList()
+{
+	pHead = new TNode<T>;
+	pHead->pNext = pHead;
+
+	pFirst = pPrev = pCurr = pLast = pStop = pHead;
+	len = 0;
+}
+
+template<class T>
+inline THeadList<T>::~THeadList()
+{
+	while (pFirst != pStop) {
+		TNode<T>* newNode = pFirst;
+		pFirst = pFirst->pNext;
+		delete newNode;
+	}
+
+	delete pHead;
+}
+
+template<class T>
+inline void THeadList<T>::InsFirst(T elem)
+{
+	TList::InsFirst(elem);
+	pHead->pNext = pFirst;
+}
+
+template<class T>
+inline void THeadList<T>::DelFirst()
+{
+	TList::DelFirst(elem);
+	pHead->pNext = pFirst;
+}
+
+class TPolinom : public THeadList<TMonom> {
+public:
+	TPolinom() : THeadList<TMonom>() {
+		TMonom m;
+		m.x = 0; m.y = 0; m.z = -1;
+		pHead->val = m;
+	}
+	TPolinom(TPolinom& cp);
+};

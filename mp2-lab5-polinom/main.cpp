@@ -8,7 +8,7 @@ void main() {
 	cin >> size;
 	for (int i = 0; i < size; i++) {
 		cin >> num;
-		list.InsCurrent(num);
+		list.InsLast(num);
 	}
 	//cout << list.GetCurr();
 	for (list.Reset(); !list.IsEnd(); list.GoNext()) {

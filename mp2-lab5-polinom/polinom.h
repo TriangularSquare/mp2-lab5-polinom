@@ -53,6 +53,7 @@ template<class T>
 inline TList<T>::~TList()
 {
 	TNode<T>* newNode;
+
 	while (pFirst != pStop) {
 		newNode = pFirst;
 		pFirst = pFirst->pNext;

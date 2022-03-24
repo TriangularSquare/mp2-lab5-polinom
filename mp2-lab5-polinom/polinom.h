@@ -1,189 +1,323 @@
 #pragma once
+#include "headlist.h"
+#include<sstream>
+using namespace std;
 
 struct TMonom {
 	double coeff;
 	int x, y, z;
+
+	TMonom(int _x = 0, int _y = 0, int _z = 0, double _coeff = 0) {
+		coeff = _coeff;
+		x = _x;
+		y = _y;
+		z = _z;
+	}
+
+	TMonom operator*(const TMonom& other) {
+		TMonom res;
+		res.coeff = coeff * other.coeff;
+		res.x = x + other.x;
+		res.y = y + other.y;
+		res.z = z + other.z;
+		return res;
+	}
+
+	bool IsConst() const {
+		return x == 0 && y == 0 && z == 0;
+	}
+
 	bool operator==(const TMonom& tm) {
 		return (x == tm.x) && (y == tm.y) && (z == tm.z);
 	}
+
 	bool operator<(const TMonom& tm) {
 		return (100 * x + 10 * y + z) < (100 * tm.x + 10 * tm.y + tm.z);
 	}
+
+	bool operator>(const TMonom& tm) {
+		return (100 * x + 10 * y + z) > (100 * tm.x + 10 * tm.y + tm.z);
+	}
+
+	friend std::ostream& operator<<(std::ostream& os, TMonom& monom)
+	{
+		if (monom.x != 0)
+		{
+			os << "x";
+			if (monom.x != 1)
+				os << monom.x;
+		}
+		if (monom.y != 0)
+		{
+			os << "y";
+			if (monom.y != 1)
+				os << monom.y;
+		}
+		if (monom.z != 0)
+		{
+			os << "z";
+			if (monom.z != 1)
+				os << monom.z;
+		}
+		return os;
+	}
 };
 
-template <class T>
-struct TNode {
-	T val;
-	TNode* pNext;
-};
 
-template <class T>
-class TList {
+class TPolinom : public THeadList<TMonom> {
 protected:
-	TNode<T>* pFirst, * pCurr, * pPrev, * pLast, * pStop;
-	int len;
+	void Print(std::ostream& os) const;
 public:
-	TList();
-	~TList();
-	
-	bool IsEmpty();
+	TPolinom();
+	TPolinom(TPolinom& tp);
 
-	void InsFirst(T value);
-	void InsLast(T value);
-	void InsCurrent(T value);
+	TPolinom& operator=(TPolinom& tp);
 
-	void delFirst();
-	void delCurrent();
+	void AddMonom(TMonom m);
 
-	void Reset();
-	void GoNext();
-	bool IsEnd();
-	T GetCurr();
+	bool operator==(TPolinom& other);
+	bool operator!=(TPolinom& other);
+
+	TPolinom operator+(TPolinom& other);
+	TPolinom operator-(TPolinom& other);
+	TPolinom operator*(TPolinom& other);
+	TPolinom operator*(TMonom& monom);
+	TPolinom operator*(double a);
+
+	friend TPolinom operator*(
+		TMonom& m,
+		TPolinom& p)
+	{
+		return p * m;
+	}
+
+	friend TPolinom operator*(
+		double a,
+		TPolinom& p)
+	{
+		return p * a;
+	}
+
+	friend std::ostream& operator<<(
+		std::ostream& os,
+		TPolinom& p)
+	{
+		p.Print(os);
+		return os;
+	}
 };
 
-template<class T>
-inline TList<T>::TList()
+inline void TPolinom::Print(std::ostream& os) const
 {
+	TNode<TMonom>* _pCurr = pFirst;
+
+	if (_pCurr == pStop)
+	{
+		os << "0";
+		return;
+	}
+
+	TMonom m = _pCurr->val;
+	double absCoeff = fabs(m.coeff);
+
+	if (m.coeff < 0) os << "- ";
+
+	if (m.IsConst())
+	{
+		os << absCoeff;
+	}
+
+	else
+	{
+		if (absCoeff != 1) os << absCoeff << "*";
+		os << m;
+	}
+
+	_pCurr = _pCurr->pNext;
+
+	for (; _pCurr != pStop; _pCurr = _pCurr->pNext)
+	{
+		TMonom m = _pCurr->val;
+		double absCoeff = fabs(m.coeff);
+
+		if (m.coeff < 0) os << " - ";
+		else os << " + ";
+
+		if (m.IsConst())
+		{
+			os << absCoeff;
+		}
+		else
+		{
+			if (absCoeff != 1)
+				os << absCoeff << "*";
+			os << m;
+		}
+	}
+}
+
+inline TPolinom::TPolinom()
+{
+	TMonom m(0, 0, -1);
+	pHead->val = m;
+}
+
+inline TPolinom::TPolinom(TPolinom& tp)
+{
+	TMonom m(0, 0, -1);
+	pHead->val = m;
+	for (tp.Reset(); !tp.IsEnd(); tp.GoNext()) {
+		InsLast(tp.GetCurr());
+	}
+}
+
+inline TPolinom& TPolinom::operator=(TPolinom& tp)
+{
+	while (pFirst != pStop)
+	{
+		DelFirst();
+	}
+
+	pFirst = pLast = pPrev = pCurr = pStop = pHead;
 	len = 0;
-	pStop = nullptr;
-	pFirst = pCurr = pPrev = pLast = pStop;
-}
 
-template<class T>
-inline TList<T>::~TList()
-{
-	TNode<T>* newNode;
-
-	while (pFirst != pStop) {
-		newNode = pFirst;
-		pFirst = pFirst->pNext;
-		delete newNode;
+	tp.Reset();
+	while (!tp.IsEnd())
+	{
+		InsLast(tp.GetCurr());
+		tp.GoNext();
 	}
+	return *this;
 }
 
-template<class T>
-inline bool TList<T>::IsEmpty()
+inline void TPolinom::AddMonom(TMonom m)
 {
-	return len == 0;
-}
+	Reset();
 
-template<class T>
-inline void TList<T>::InsFirst(T value)
-{
-	TNode<T>* newNode = new TNode<T>;
-	newNode->val = value;
-	newNode->pNext = pFirst;
-	pFirst = newNode;
+	while (m < pCurr->val)
+	{
+		GoNext();
+	}
 
-	len++;
-
-	if (len == 1) {
-		pLast = pFirst;
-		pCurr = pFirst;
+	if (pCurr->val == m)
+	{
+		pCurr->val.coeff += m.coeff;
+		if (pCurr->val.coeff == 0)
+		{
+			DelCurrent();
+		}
+	}
+	else
+	{
+		InsCurrent(m);
 	}
 }
 
-template<class T>
-inline void TList<T>::InsLast(T value)
+inline bool TPolinom::operator==(TPolinom& other)
 {
-	if (len > 0) {
-		TNode<T>* newNode = new TNode<T>;
-		newNode->val = value;
-		newNode->pNext = pStop;
-		pLast->pNext = newNode;
-		pLast = newNode;
+	TPolinom oth(other);
+	Reset();
+	oth.Reset();
 
-		len++;
+	while (!IsEnd()) {
+		if (!(pCurr->val == oth.pCurr->val)) {
+			return false;
+		}
+		else {
+			GoNext();
+			oth.GoNext();
+		}
 	}
-	else {
-		InsFirst(value);
-	}
+
+	return true;
 }
 
-template<class T>
-inline void TList<T>::InsCurrent(T value)
+inline bool TPolinom::operator!=(TPolinom& other)
 {
-	if (pCurr == pFirst) {
-		InsFirst(value);
-	}
-	else if (pCurr == pLast) {
-		InsLast(value);
-	}
-	else {
-		TNode<T>* newNode = new TNode<T>;
-		newNode->val = value;
-		newNode->pNext = pCurr;
-		pCurr = newNode;
-		pPrev->pNext = pCurr;
-		len++;
-	}
+	return !(this == &other);
 }
 
-template<class T>
-inline void TList<T>::delFirst()
+inline TPolinom TPolinom::operator+(TPolinom& other)
 {
-	if (IsEmpty()) {
-		throw "List is empty";
+	TPolinom res(other);
+	Reset(); 
+	res.Reset();
+
+	while (!IsEnd())
+	{
+		if (res.pCurr->val > pCurr->val)
+		{
+			res.GoNext();
+		}
+		else if (res.pCurr->val < pCurr->val)
+		{
+			res.InsCurrent(pCurr->val);
+			GoNext();
+		}
+		else
+		{
+			res.pCurr->val.coeff += pCurr->val.coeff;
+			if (res.pCurr->val.coeff == 0)
+			{
+				res.DelCurrent();
+				GoNext();
+			}
+			else
+			{
+				res.GoNext();
+				GoNext();
+			}
+		}
 	}
-
-	if (pCurr == pFirst) {
-		pPrev = pStop;
-		pCurr = pCurr->pNext;
-	}
-
-	TNode<T>* newNode = pFirst;
-	pFirst = newNode->pNext;
-	delete newNode;
-
-	len--;
-
-	if (pFirst == pStop) {
-		pLast = pStop;
-	}
+	return res;
 }
 
-template<class T>
-inline void TList<T>::delCurrent()
+inline TPolinom TPolinom::operator-(TPolinom& other)
 {
-	if (IsEmpty()) {
-		throw "List is empty";
+	return operator+(other.operator*(-1));
+}
+
+inline TPolinom TPolinom::operator*(TPolinom& other)
+{
+	TPolinom res;
+
+	for (Reset(); !IsEnd(); GoNext())
+	{
+		TMonom m = GetCurr();
+		TPolinom temp = m * other;
+		res = res + temp;
 	}
 
-	if (pCurr == pFirst) {
-		delFirst();
+	return res;
+}
+
+inline TPolinom TPolinom::operator*(TMonom& monom)
+{
+	TPolinom res;
+
+	if (monom.coeff == 0) return res;
+
+	for (Reset(); !IsEnd(); GoNext())
+	{
+		TMonom m = GetCurr();
+		res.InsLast(m * monom);
 	}
-	else {
-		TNode<T>* newNode = pCurr;
-		pCurr = newNode->pNext;
-		pPrev->pNext = pCurr;
-		delete newNode;
 
-		len--;
+	return res;
+}
+
+inline TPolinom TPolinom::operator*(double a)
+{
+	TPolinom res;
+
+	if (a == 0) return res;
+
+	for (Reset(); !IsEnd(); GoNext())
+	{
+		TMonom m = GetCurr();
+		m.coeff *= a;
+
+		res.InsLast(m);
 	}
-}
-
-template<class T>
-inline void TList<T>::Reset()
-{
-	pPrev = pStop;
-	pCurr = pFirst;
-}
-
-template<class T>
-inline void TList<T>::GoNext()
-{
-	pPrev = pCurr;
-	pCurr = pCurr->pNext;
-}
-
-template<class T>
-inline bool TList<T>::IsEnd()
-{
-	return (pCurr == pStop);
-}
-
-template<class T>
-inline T TList<T>::GetCurr()
-{
-	return pCurr->val;
+	return res;
 }

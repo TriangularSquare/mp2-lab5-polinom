@@ -15,7 +15,7 @@ protected:
 public:
 	TList();
 	~TList();
-	
+
 	bool IsEmpty();
 
 	void InsFirst(T value);

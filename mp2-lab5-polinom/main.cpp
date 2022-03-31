@@ -16,7 +16,7 @@ void main() {
 		double coeff;
 		int x, y, z;
 		cin >> coeff >> x >> y >> z;
-		TMonom tm(x, y, z, coeff);
+		TMonom tm(coeff, x, y, z);
 		tp1.AddMonom(tm);
 	}
 
@@ -27,7 +27,7 @@ void main() {
 		double coeff;
 		int x, y, z;
 		cin >> coeff >> x >> y >> z;
-		TMonom tm(x, y, z, coeff);
+		TMonom tm(coeff, x, y, z);
 		tp2.AddMonom(tm);
 	}
 
@@ -38,5 +38,5 @@ void main() {
 	cout << "Произведение:" << tp1 * tp2 << '\n';
 	cout << "Умножение полинома на 2:" << tp1 * 2 << '\n';
 	TMonom tm(3, 3, 4, 7);
-	cout << "Умнлжение полинома на моном:" << tp1 * tm << '\n';
+	cout << "Умножение полинома на моном:" << tp1 * tm << '\n';
 }

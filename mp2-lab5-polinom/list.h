@@ -14,15 +14,15 @@ protected:
 	int len;
 public:
 	TList();
-	~TList();
+	virtual ~TList();
 
 	bool IsEmpty();
 
-	void InsFirst(T value);
+	virtual void InsFirst(T value);
 	void InsLast(T value);
 	void InsCurrent(T value);
 
-	void DelFirst();
+	virtual void DelFirst();
 	void DelCurrent();
 
 	void Reset();
@@ -42,10 +42,8 @@ inline TList<T>::TList()
 template<class T>
 inline TList<T>::~TList()
 {
-	TNode<T>* newNode;
-
 	while (pFirst != pStop) {
-		newNode = pFirst;
+		TNode<T>* newNode = pFirst;
 		pFirst = pFirst->pNext;
 		delete newNode;
 	}
@@ -54,7 +52,7 @@ inline TList<T>::~TList()
 template<class T>
 inline bool TList<T>::IsEmpty()
 {
-	return len == 0;
+	return pFirst == pStop;
 }
 
 template<class T>
@@ -69,7 +67,6 @@ inline void TList<T>::InsFirst(T value)
 
 	if (len == 1) {
 		pLast = pFirst;
-		pCurr = pFirst;
 	}
 }
 
@@ -95,16 +92,18 @@ inline void TList<T>::InsCurrent(T value)
 {
 	if (pCurr == pFirst) {
 		InsFirst(value);
+		pPrev = pFirst;
 	}
 	else if (pCurr == pLast) {
 		InsLast(value);
+		pPrev = pLast;
 	}
 	else {
 		TNode<T>* newNode = new TNode<T>;
 		newNode->val = value;
 		newNode->pNext = pCurr;
+		pPrev->pNext = newNode;
 		pCurr = newNode;
-		pPrev->pNext = pCurr;
 		len++;
 	}
 }
@@ -127,24 +126,27 @@ inline void TList<T>::DelFirst()
 
 	len--;
 
+	/*
 	if (pFirst == pStop) {
 		pLast = pStop;
-	}
+	}*/
 }
 
 template<class T>
 inline void TList<T>::DelCurrent()
 {
-	if (IsEmpty()) {
+	if (pCurr == pStop) {
 		throw "List is empty";
 	}
 
 	if (pCurr == pFirst) {
 		DelFirst();
+		pPrev = pStop; 
+		pCurr = pFirst;
 	}
 	else {
 		TNode<T>* newNode = pCurr;
-		pCurr = newNode->pNext;
+		pCurr = pCurr->pNext;
 		pPrev->pNext = pCurr;
 		delete newNode;
 
@@ -175,5 +177,7 @@ inline bool TList<T>::IsEnd()
 template<class T>
 inline T TList<T>::GetCurr()
 {
+	if (pCurr == pStop)
+		throw "Can't get current element: it's a barrier";
 	return pCurr->val;
 }

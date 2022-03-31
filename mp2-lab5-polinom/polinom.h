@@ -7,7 +7,7 @@ struct TMonom {
 	double coeff;
 	int x, y, z;
 
-	TMonom(int _x = 0, int _y = 0, int _z = 0, double _coeff = 0) {
+	TMonom(double _coeff = 0, int _x = 0, int _y = 0, int _z = 0) {
 		coeff = _coeff;
 		x = _x;
 		y = _y;
@@ -30,13 +30,23 @@ struct TMonom {
 	bool operator==(const TMonom& tm) {
 		return (x == tm.x) && (y == tm.y) && (z == tm.z);
 	}
-
+	
 	bool operator<(const TMonom& tm) {
-		return (100 * x + 10 * y + z) < (100 * tm.x + 10 * tm.y + tm.z);
+		if (x < tm.x) return true;
+		else if (x == tm.x)
+		{
+			if (y < tm.y) return true;
+			else if (y == tm.y)
+			{
+				return z < tm.z;
+			}
+			else return false;
+		}
+		else return false;
 	}
-
+	
 	bool operator>(const TMonom& tm) {
-		return (100 * x + 10 * y + z) > (100 * tm.x + 10 * tm.y + tm.z);
+		return !operator<(tm) && !operator==(tm);
 	}
 
 	friend std::ostream& operator<<(std::ostream& os, TMonom& monom)
@@ -175,7 +185,9 @@ inline TPolinom& TPolinom::operator=(TPolinom& tp)
 {
 	while (pFirst != pStop)
 	{
-		DelFirst();
+		TNode<TMonom>* tmp = pFirst;
+		pFirst = pFirst->pNext;
+		delete tmp;
 	}
 
 	pFirst = pLast = pPrev = pCurr = pStop = pHead;

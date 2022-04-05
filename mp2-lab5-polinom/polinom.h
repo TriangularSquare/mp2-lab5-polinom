@@ -232,7 +232,7 @@ inline bool TPolinom::operator==(TPolinom& other)
 	oth.Reset();
 
 	while (!IsEnd()) {
-		if (!(pCurr->val == oth.pCurr->val)) {
+		if (!(pCurr->val == oth.pCurr->val) || (pCurr->val.coeff != oth.pCurr->val.coeff)) {
 			return false;
 		}
 		else {

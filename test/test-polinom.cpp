@@ -61,7 +61,6 @@ TEST(TPolinom, CanAddPolinomToPolinom_1)
 	TPolinom correct;
 
 	EXPECT_TRUE(sum == correct);
-	//EXPECT_EQ(sum, correct);
 }
 
 TEST(TPolinom, CanAddPolinomToPolinom_2)
@@ -84,7 +83,6 @@ TEST(TPolinom, CanAddPolinomToPolinom_2)
 	correct.AddMonom(tm4);
 
 	EXPECT_TRUE(sum == correct);
-	//EXPECT_EQ(sum, correct);
 }
 
 TEST(TPolinom, CanAddPolinomToPolinom_3)
@@ -108,9 +106,63 @@ TEST(TPolinom, CanAddPolinomToPolinom_3)
 	correct.AddMonom(tm4);
 
 	EXPECT_TRUE(sum == correct);
-	//EXPECT_EQ(sum, correct);
 }
 
+TEST(TPolinom, CanAddPolinomToPolinom_4)
+{
+	TPolinom tp1;
+	TMonom tm1(1, 1, 2, 3);
+	TMonom tm2(7, 5, 5, 4);
+	TMonom tm3(10, 2, 7, 8);
+	tp1.AddMonom(tm1);
+	tp1.AddMonom(tm2);
+	tp1.AddMonom(tm3);
+
+	TPolinom tp2;
+	TMonom tm4(-1, 1, 2, 3);
+	TMonom tm5(-5, 5, 5, 4);
+	tp2.AddMonom(tm4);
+	tp2.AddMonom(tm5);
+
+
+	TPolinom sum;
+	ASSERT_NO_THROW(sum = tp1 + tp2);
+
+	TPolinom correct;
+	TMonom tm6(10, 2, 7, 8);
+	TMonom tm7(2, 5, 5, 4);
+	correct.AddMonom(tm6);
+	correct.AddMonom(tm7);
+
+	EXPECT_TRUE(sum == correct);
+}
+
+TEST(TPolinom, CanAddPolinomToPolinom_5)
+{
+	TPolinom tp1;
+	TMonom tm1(10, 2, 2, 3);
+	TMonom tm2(7, 5, 5, 4);
+	TMonom tm3(10, 2, 7, 8);
+	tp1.AddMonom(tm1);
+	tp1.AddMonom(tm2);
+	tp1.AddMonom(tm3);
+
+	TPolinom tp2;
+	TMonom tm4(-10, 2, 2, 3);
+	TMonom tm5(-7, 5, 5, 4);
+	tp2.AddMonom(tm4);
+	tp2.AddMonom(tm5);
+
+
+	TPolinom sum;
+	ASSERT_NO_THROW(sum = tp1 + tp2);
+
+	TPolinom correct;
+	TMonom tm6(10, 2, 7, 8);
+	correct.AddMonom(tm6);
+
+	EXPECT_TRUE(sum == correct);
+}
 
 TEST(TPolinom, CanMultiplyPolinomByZeroDouble)
 {
@@ -126,7 +178,6 @@ TEST(TPolinom, CanMultiplyPolinomByZeroDouble)
 	ASSERT_NO_THROW(res = 0 * tp);
 
 	EXPECT_TRUE(res == TPolinom());
-	//EXPECT_EQ(res, TPolinom());
 }
 
 TEST(TPolinom, CanMultiplyPolynomByDouble)
@@ -151,7 +202,6 @@ TEST(TPolinom, CanMultiplyPolynomByDouble)
 	correct.AddMonom(tm6);
 
 	EXPECT_TRUE(res == correct);
-	//EXPECT_EQ(res, correct);
 }
 
 TEST(TPolinom, CanMultiplyPolinomByMonom)
@@ -174,10 +224,9 @@ TEST(TPolinom, CanMultiplyPolinomByMonom)
 	correct.AddMonom(tm5);
 
 	EXPECT_TRUE(res == correct);
-	//EXPECT_EQ(res, correct);
 }
 
-TEST(TPolinom, CanMultiplyPolinomByPolynom)
+TEST(TPolinom, CanMultiplyPolinomByPolynom_1)
 {
 	TPolinom tp1;
 	TMonom tm1(1, 1, 0, 0);
@@ -199,5 +248,48 @@ TEST(TPolinom, CanMultiplyPolinomByPolynom)
 	correct.AddMonom(tm5);
 
 	EXPECT_TRUE(res == correct);
-	//EXPECT_EQ(res, correct);
+}
+
+TEST(TPolinom, CanMultiplyPolinomByPolynom_2)
+{
+	TPolinom tp1;
+	TMonom tm1(7, 2, 5, 8);
+	TMonom tm2(4, 3, 5, 9);
+	TMonom tm3(-2, 2, 2, 1);
+	tp1.AddMonom(tm1);
+	tp1.AddMonom(tm2);
+	tp1.AddMonom(tm3);
+
+	TPolinom tp2;
+	TMonom tm4(2, 1, 1, 1);
+	TMonom tm5(3, 1, 2, 3);
+	TMonom tm6(8, 5, 7, 2);
+	tp2.AddMonom(tm4);
+	tp2.AddMonom(tm5);
+	tp2.AddMonom(tm6);
+
+	TPolinom res;
+	ASSERT_NO_THROW(res = tp1 * tp2);
+
+	TPolinom correct;
+	TMonom tm7(32, 8, 12, 11);
+	TMonom tm8(56, 7, 12, 10);
+	TMonom tm9(-16, 7, 9, 3);
+	TMonom tm10(12, 4, 7, 12);
+	TMonom tm11(8, 4, 6, 10);
+	TMonom tm12(21, 3, 7, 11);
+	TMonom tm13(14, 3, 6, 9);
+	TMonom tm14(-6, 3, 4, 4);
+	TMonom tm15(-4, 3, 3, 2);
+	correct.AddMonom(tm7);
+	correct.AddMonom(tm8);
+	correct.AddMonom(tm9);
+	correct.AddMonom(tm10);
+	correct.AddMonom(tm11);
+	correct.AddMonom(tm12);
+	correct.AddMonom(tm13);
+	correct.AddMonom(tm14);
+	correct.AddMonom(tm15);
+
+	EXPECT_TRUE(res == correct);
 }
